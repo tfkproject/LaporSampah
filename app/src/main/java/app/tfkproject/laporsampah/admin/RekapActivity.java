@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,10 +65,16 @@ public class RekapActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private static String url = Config.HOST+"laporan_rekap.php";
 
+    private String tanggal;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rekap);
+
+        if(tanggal == null){
+            tanggal = "";
+        }
 
         getSupportActionBar().setTitle("Rekapitulasi");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -213,9 +220,14 @@ public class RekapActivity extends AppCompatActivity {
             finish();
         }
 
+        if (id == R.id.action_print){
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://203.153.21.11/app/lapor-sampah/api/print/?tgl="+tanggal));
+            startActivity(browserIntent);
+        }
+
         if (id == R.id.action_refresh){
             items.clear();
-            new dapatkanData(null).execute();
+            new dapatkanData("tgl="+tanggal).execute();
         }
 
         if (id == R.id.action_filter){
@@ -236,7 +248,7 @@ public class RekapActivity extends AppCompatActivity {
         public void onDateSet(DatePicker view, int selectedYear,
                               int selectedMonth, int selectedDay) {
             NumberFormat f = new DecimalFormat("00");
-            String tanggal = selectedYear + "-" + (f.format(selectedMonth + 1)) + "-" + f.format(selectedDay);
+            tanggal = selectedYear + "-" + (f.format(selectedMonth + 1)) + "-" + f.format(selectedDay);
             items.clear();
             new dapatkanData("tgl="+tanggal).execute();
         }
